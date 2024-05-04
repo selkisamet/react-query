@@ -1,31 +1,29 @@
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import "./App.css";
 
 function App() {
-  const fetchData = useQuery(["posts"], () => {
-    return fetch("https://jsonplaceholder.typicode.com/posts").then(res => res.json());
-  }, {
-    enabled: false
-  });
+  // https://jsonplaceholder.typicode.com/users
 
-  const { data, isLoading, refetch } = fetchData;
+  const { data, reset, mutate, isLoading } = useMutation(["users"], (newPost) => {
+    return fetch("https://jsonplaceholder.typicode.com/users", {
+      method: "POST",
+      body: JSON.stringify(newPost),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    }).then(res => res.json());
+  });
 
   if (isLoading) {
     return <div>Loading...</div>
   }
 
-  console.log(data, isLoading);
+  console.log("mutation data: ", data);
 
   return (
     <div>
-      <button onClick={() => refetch()}>Veri Çek</button>
-      <div>
-        {
-          data && data.map((value, index) => (
-            <div key={index}>{value.title}</div>
-          ))
-        }
-      </div>
+      <button onClick={() => mutate({ userId: 1, title: "Test", body: "Merhaba Test" })}>Veri Ekle</button>
+      <button onClick={() => reset()}>Veri Sil</button>
     </div>
   )
 }
